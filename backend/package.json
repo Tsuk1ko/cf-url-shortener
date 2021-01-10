@@ -1,0 +1,17 @@
+{
+  "name": "backend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "npm run cfworker -- run -w index.js",
+    "build": "npm run cfworker build index.js && terser dist/worker.js -cm --comments=false -o dist/worker.js",
+    "cfworker": "node --experimental-json-modules --no-warnings node_modules/@cfworker/dev/src/cli/index.js"
+  },
+  "dependencies": {
+    "@cfworker/web": "^1.6.5"
+  },
+  "devDependencies": {
+    "@cfworker/dev": "^1.6.5",
+    "terser": "^5.5.1"
+  }
+}
