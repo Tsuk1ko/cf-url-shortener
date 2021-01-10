@@ -22,6 +22,8 @@ jobs:
           ref: main
           persist-credentials: false
       - name: Install dependencies and build
+        env:
+          VUE_APP_ADDITION_HEAD: ${{ secrets.ADDITION_HEAD }}
         run: |
           cd frontend
           yarn install --frozen-lockfile

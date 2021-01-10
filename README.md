@@ -10,6 +10,10 @@
 
 附带 GitHub Actions 自动部署到 gh-pages 分支，但首次可能需要自己去 Settings 里启用一下 GitHub Pages
 
+### Secrets
+
+- `ADDITION_HEAD` - 会被添加到 `</head>` 前，可放置统计代码等
+
 ## backend
 
 利用 Cloudflare Workers 提供的免费 KV 来储存
