@@ -20,41 +20,50 @@ const resError = (res, code) => {
 
 router.get('/:key', async ({ req, res }) => {
   const { key } = req.params;
-  const url = await URL_DB.get(key);
-  if (url) {
-    res.status = 301;
-    res.redirect(url);
-  } else res.status = 404;
+  try {
+    const url = await URL_DB.get(key);
+    if (url) {
+      res.status = 301;
+      res.redirect(url);
+    } else res.status = 404;
+  } catch (error) {
+    res.status = 503;
+    res.body = error.toString();
+  }
 });
 
 router.post('/shorten', async ({ req, res }) => {
-  const { url: longUrl } = await req.body.json();
-  if (!longUrl) {
-    resError(res, 1000);
-    return;
-  }
-  if (!urlReg.test(longUrl)) {
-    resError(res, 1001);
-    return;
-  }
-  let key;
-  if (tmpMap.has(longUrl)) key = tmpMap.get(longUrl);
-  else {
-    let tryRemain = 101;
-    do {
-      key = await randkey();
-    } while (--tryRemain && (await URL_DB.get(key)));
-    if (!tryRemain) {
-      resError(res, 1002);
+  try {
+    const { url: longUrl } = await req.body.json();
+    if (!longUrl) {
+      resError(res, 1000);
       return;
     }
-    await URL_DB.put(key, longUrl);
-    tmpMap.set(longUrl, key);
+    if (!urlReg.test(longUrl)) {
+      resError(res, 1001);
+      return;
+    }
+    let key;
+    if (tmpMap.has(longUrl)) key = tmpMap.get(longUrl);
+    else {
+      let tryRemain = 101;
+      do {
+        key = await randkey();
+      } while (--tryRemain && (await URL_DB.get(key)));
+      if (!tryRemain) {
+        resError(res, 1002);
+        return;
+      }
+      await URL_DB.put(key, longUrl);
+      tmpMap.set(longUrl, key);
+    }
+    const url = new URL(req.url.href);
+    url.search = '';
+    url.pathname = `/${key}`;
+    res.body = { code: 0, msg: '', url: url.href };
+  } catch (error) {
+    res.body = { code: -1, msg: error.toString() };
   }
-  const url = new URL(req.url.href);
-  url.search = '';
-  url.pathname = `/${key}`;
-  res.body = { code: 0, msg: '', url: url.href };
 });
 
 new Application().use(router.middleware).listen();
