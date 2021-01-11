@@ -12,7 +12,7 @@
             <span>GitHub</span>
           </v-tooltip>
         </div>
-        <div class="text-h3 text-sm-h2 mb-6" style="font-weight: 300">{{ title }}</div>
+        <div class="text-h3 text-sm-h2 mb-12" style="font-weight: 300">{{ title }}</div>
         <div id="url-input">
           <v-text-field
             v-model="url"
