@@ -1,5 +1,6 @@
 import { Application, Router } from '@cfworker/web';
 import randkey from './utils/randkey';
+import sha1keys from './utils/sha1key';
 
 // dev
 // import MemKV from './mocks/kv';
@@ -12,7 +13,8 @@ const urlReg = /^https?:\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-]
 const errMap = {
   1000: '网址呢',
   1001: '不是有效的网址',
-  1002: '键已饱和，无法生成短网址',
+  1002: '网址长度不能大于 512',
+  1003: '键已饱和，无法生成短网址',
 };
 const resError = (res, code) => {
   res.body = { code, msg: errMap[code] };
@@ -43,20 +45,40 @@ router.post('/shorten', async ({ req, res }) => {
       resError(res, 1001);
       return;
     }
+    if (longUrl.length > 512) {
+      resError(res, 1002);
+      return;
+    }
+
     let key;
     if (tmpMap.has(longUrl)) key = tmpMap.get(longUrl);
     else {
-      let tryRemain = 101;
-      do {
-        key = await randkey();
-      } while (--tryRemain && (await URL_DB.get(key)));
-      if (!tryRemain) {
-        resError(res, 1002);
-        return;
+      // hash key
+      const hashKeys = await sha1keys(longUrl);
+      for (const hashKey of hashKeys) {
+        const storedUrl = await URL_DB.get(hashKey);
+        if (!storedUrl || storedUrl === longUrl) {
+          key = hashKey;
+          break;
+        }
       }
+
+      // random key
+      if (!key) {
+        let tryRemain = 1001;
+        do {
+          key = await randkey();
+        } while (--tryRemain && (await URL_DB.get(key)));
+        if (!tryRemain) {
+          resError(res, 1003);
+          return;
+        }
+      }
+
       await URL_DB.put(key, longUrl);
       tmpMap.set(longUrl, key);
     }
+
     const url = new URL(req.url.href);
     url.search = '';
     url.pathname = `/${key}`;
