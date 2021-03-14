@@ -10,7 +10,7 @@ const URL_MAX_LEN = 1024;
 
 const router = new Router();
 const tmpMap = new Map();
-const urlReg = /^https?:\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?$/;
+const urlReg = /^https?:\/\/[\w_-]+(\.[\w_-]+)+[!-~]*$/;
 
 const errMap = {
   1000: '网址呢',

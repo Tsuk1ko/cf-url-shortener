@@ -65,7 +65,7 @@
 import Snackbar from '@/components/snackbar';
 import copyText from '@/utils/clipboard';
 
-const urlReg = /^https?:\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?$|^$/;
+const urlReg = /^https?:\/\/[\w_-]+(\.[\w_-]+)+[!-~]*$|^$/;
 
 export default {
   name: 'App',
