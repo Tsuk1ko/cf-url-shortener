@@ -16,7 +16,7 @@
 
 ## backend
 
-利用 Cloudflare Workers 提供的免费 KV 来储存，原网址长度最长 512，产生的短网址 ID 为长度为 6 的 Base56 `23456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz`
+利用 Cloudflare Workers 提供的免费 KV 来储存，原网址长度最长 1024，产生的短网址 ID 为长度为 6 的 Base56 `23456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz`
 
 优先采用哈希算法生成 ID，每个 URL 能够通过哈希算法产生 4 个 ID，若全部已被占用则使用随机生成的 ID，最多尝试 1000 次
 
