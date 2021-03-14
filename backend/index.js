@@ -6,6 +6,8 @@ import sha1keys from './utils/sha1key';
 // import MemKV from './mocks/kv';
 // const URL_DB = new MemKV();
 
+const URL_MAX_LEN = 1024;
+
 const router = new Router();
 const tmpMap = new Map();
 const urlReg = /^https?:\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?$/;
@@ -13,7 +15,7 @@ const urlReg = /^https?:\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-]
 const errMap = {
   1000: '网址呢',
   1001: '不是有效的网址',
-  1002: '网址长度不能大于 512',
+  1002: `网址长度不能大于 ${URL_MAX_LEN}`,
   1003: '键已饱和，无法生成短网址',
 };
 const resError = (res, code) => {
@@ -45,7 +47,7 @@ router.post('/shorten', async ({ req, res }) => {
       resError(res, 1001);
       return;
     }
-    if (longUrl.length > 512) {
+    if (longUrl.length > URL_MAX_LEN) {
       resError(res, 1002);
       return;
     }
