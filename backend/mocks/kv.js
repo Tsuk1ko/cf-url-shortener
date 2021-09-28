@@ -3,9 +3,9 @@ export default class KV extends Map {
     super();
   }
   async get() {
-    return super.get(arguments);
+    return super.get(...arguments);
   }
   async put() {
-    return super.set(arguments);
+    return super.set(...arguments);
   }
 }

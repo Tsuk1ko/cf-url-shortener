@@ -2,10 +2,6 @@ import { Application, Router } from '@cfworker/web';
 import randkey from './utils/randkey';
 import sha1keys from './utils/sha1key';
 
-// dev
-// import MemKV from './mocks/kv';
-// const URL_DB = new MemKV();
-
 const URL_MAX_LEN = 1024;
 
 const router = new Router();

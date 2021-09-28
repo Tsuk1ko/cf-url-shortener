@@ -1,0 +1,2 @@
+import './mocks';
+import '.';

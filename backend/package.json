@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "npm run cfworker -- run -w index.js",
+    "serve": "npm run cfworker -- run -w dev.js",
     "build": "npm run cfworker build index.js && terser dist/worker.js -cm --comments=false -o dist/worker.js",
     "cfworker": "node --experimental-json-modules --no-warnings node_modules/@cfworker/dev/src/cli/index.js"
   },
