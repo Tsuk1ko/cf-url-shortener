@@ -1,0 +1,77 @@
+name: Deploy
+
+on:
+  push:
+    branches: ['main']
+    paths:
+      - 'api/**'
+      - 'src/**'
+      - 'public/**'
+      - 'types/**'
+      - 'deploy.tf'
+      - 'package.json'
+      - 'vite.config.ts'
+      - '.github/workflows/deploy.yml'
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ^1
+
+      - name: Setup bun
+        uses: oven-sh/setup-bun@v2
+
+      # Automatically get an account id via the API Token
+      # if secrets.CLOUDFLARE_ACCOUNT_ID is not set.
+      - name: Fetch Account ID
+        id: fetch_account_id
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          if [[ -n "${{ secrets.CLOUDFLARE_ACCOUNT_ID }}" ]]; then
+            ACCOUNT_ID="${{ secrets.CLOUDFLARE_ACCOUNT_ID }}"
+            echo "Using provided CLOUDFLARE_ACCOUNT_ID from secrets."
+          else
+            ACCOUNT_ID=$(curl -X GET "https://api.cloudflare.com/client/v4/accounts" -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" -H "Content-Type:application/json" | jq ".result[0].id" -r)
+            if [[ "$ACCOUNT_ID" == "null" ]]; then
+              echo "Failed to get an account id, please make sure you have set up CLOUDFLARE_API_TOKEN correctly!"
+              exit 1
+            fi
+          fi
+          echo 'account_id='$ACCOUNT_ID >> $GITHUB_OUTPUT
+
+      - name: Install dependencies
+        run: bun i
+
+      - name: Build page
+        env:
+          VITE_ADDITION_HEAD: ${{ secrets.ADDITION_HEAD }}
+        run: bun run build
+
+      - name: Deploy using Terraform
+        continue-on-error: true
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          TF_VAR_CLOUDFLARE_ACCOUNT_ID: ${{ steps.fetch_account_id.outputs.account_id }}
+        run: |
+          terraform init
+          terraform apply -auto-approve -input=false
+
+      - name: Initialize Database
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ steps.fetch_account_id.outputs.account_id }}
+        run: bunx wrangler d1 execute cf-url-shortener-db -y --remote --file=api/setup.sql
+
+      - name: Upload pages
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ steps.fetch_account_id.outputs.account_id }}
+        run: bunx wrangler pages deploy dist --project-name cf-url-shortener

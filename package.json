@@ -1,0 +1,36 @@
+{
+  "name": "cf-url-shortener",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "run-p type-check \"build-only {@}\" --",
+    "preview": "vite preview",
+    "build-only": "vite build && bun run api/build.ts",
+    "type-check": "vue-tsc --build --force",
+    "dev:init-d1": "wrangler d1 execute cf-url-shortener-db --config api/wrangler.toml --local --file=api/setup.sql --persist-to api/functions/.wrangler/state"
+  },
+  "dependencies": {
+    "array-buffer-to-hex": "^1.0.0",
+    "vue": "^3.4.31"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240712.0",
+    "@mdi/font": "^7.4.47",
+    "@tsconfig/node20": "^20.1.4",
+    "@types/bun": "^1.1.6",
+    "@types/node": "^20.14.10",
+    "@vitejs/plugin-vue": "^5.0.5",
+    "@vue/tsconfig": "^0.5.1",
+    "npm-run-all2": "^6.2.2",
+    "prettier": "^3.3.3",
+    "sass": "^1.77.8",
+    "typescript": "~5.5.3",
+    "vite": "^5.3.3",
+    "vite-plugin-cloudflare-functions": "^0.7.0",
+    "vite-plugin-vuetify": "^2.0.3",
+    "vue-tsc": "^2.0.26",
+    "wrangler": "^3.64.0"
+  }
+}

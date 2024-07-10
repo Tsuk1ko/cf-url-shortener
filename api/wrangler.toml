@@ -1,0 +1,7 @@
+name = "cf-url-shortener"
+compatibility_date = "2024-07-12"
+
+[[d1_databases]]
+binding = "CF_URL_SHORTENER_DB"
+database_name = "cf-url-shortener-db"
+database_id = "cf-url-shortener-db-dev"

@@ -1,0 +1,9 @@
+-- DROP TABLE IF EXISTS shorten;
+CREATE TABLE IF NOT EXISTS shorten (
+  id CHAR(6) PRIMARY KEY,
+  url TEXT NOT NULL,
+  createTime UNSIGNED BIGINT NOT NULL
+);
+
+-- DROP INDEX IF EXISTS idxShortenUrl;
+CREATE INDEX IF NOT EXISTS idxShortenUrl ON shorten(url);
