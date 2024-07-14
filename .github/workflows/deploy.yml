@@ -27,6 +27,8 @@ jobs:
 
       - name: Setup bun
         uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
 
       # Automatically get an account id via the API Token
       # if secrets.CLOUDFLARE_ACCOUNT_ID is not set.
