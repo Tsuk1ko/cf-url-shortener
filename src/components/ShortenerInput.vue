@@ -63,14 +63,6 @@ let copiedTooltipTimeout: number | null = null;
 
 const { xs } = useDisplay();
 
-watch(
-  xs,
-  val => {
-    console.log('xs', val);
-  },
-  { immediate: true },
-);
-
 const textFieldRef = ref<InstanceType<typeof VTextField>>();
 
 const loading = ref(false);
